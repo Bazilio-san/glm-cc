@@ -10,23 +10,23 @@ npm install -g @bazilio-san/glm-cc
 
 ## Usage
 
-### Start claude with your configuration
+All arguments are passed through to `claude`, so you can use `glm` as a drop-in replacement:
+
 ```bash
-glm
+glm                        # launch claude interactively
+glm -h                     # claude -h
+glm plugin -h              # claude plugin -h
+glm -p "hello"             # claude -p "hello"
+glm --version              # claude --version
+glm mcp serve              # claude mcp serve
 ```
 
-### Interactive configuration
-```bash
-glm -c
-# or
-glm --config
-```
+### glm-specific commands
 
-### Show help and current settings
 ```bash
-glm -h
-# or
-glm --help
+glm -c                     # interactive configuration (alias: --glm-config)
+glm --glm-show             # show current settings
+glm --glm-version          # show glm version
 ```
 
 ## Configuration

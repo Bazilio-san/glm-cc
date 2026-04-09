@@ -78,16 +78,8 @@ async function runConfig(fields) {
   return config;
 }
 
-function showHelp(config) {
+function showConfig(config) {
   const lines = [
-    '',
-    'Usage: glm [options]',
-    '',
-    'Options:',
-    '  -c, --config    Interactive configuration',
-    '  -h, --help      Show this help',
-    '',
-    'Without options: applies config to environment and launches claude.',
     '',
     `Config file: ${CONFIG_FILE}`,
     '',
@@ -103,14 +95,14 @@ function showHelp(config) {
   console.log(lines.join('\n'));
 }
 
-function launchClaude(config) {
+function launchClaude(config, args) {
   const env = { ...process.env };
   for (const field of CONFIG_FIELDS) {
     if (config[field.key]) {
       env[field.key] = config[field.key];
     }
   }
-  const proc = spawn('claude', [], {
+  const proc = spawn('claude', args, {
     env,
     stdio: 'inherit',
     shell: process.platform === 'win32',
@@ -125,18 +117,19 @@ function launchClaude(config) {
 async function main() {
   const args = process.argv.slice(2);
 
-  if (args.includes('-v') || args.includes('-V') || args.includes('--version') || args.includes('-version')) {
-    console.log(pkg.version);
-    return;
-  }
-
-  if (args.includes('-h') || args.includes('--help')) {
-    showHelp(loadConfig());
-    return;
-  }
-
-  if (args.includes('-c') || args.includes('--config')) {
+  // Only glm-specific flags: --config, --show-config, --glm-version
+  if (args.includes('--glm-config') || args.includes('-c')) {
     await runConfig(CONFIG_FIELDS);
+    return;
+  }
+
+  if (args.includes('--glm-show')) {
+    showConfig(loadConfig());
+    return;
+  }
+
+  if (args.includes('--glm-version')) {
+    console.log(`glm v${pkg.version}`);
     return;
   }
 
@@ -150,7 +143,8 @@ async function main() {
     config = loadConfig();
   }
 
-  launchClaude(config);
+  // All arguments are passed through to claude
+  launchClaude(config, args);
 }
 
 main().catch(err => {
