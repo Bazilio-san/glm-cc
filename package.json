@@ -1,11 +1,12 @@
 {
   "name": "@bazilio-san/glm-cc",
-  "version": "1.0.0",
+  "version": "1.0.15",
   "description": "CLI tool for running claude with custom GLM configuration",
   "main": "bin/glm.js",
   "bin": {
-    "glm": "./bin/glm.js"
+    "glm": "bin/glm.js"
   },
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

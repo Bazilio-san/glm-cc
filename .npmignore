@@ -17,6 +17,15 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
+# Temp and misc
+_tmp/
+_misc/
+temp/
+tmp/
+
+# Scripts (publish helper, not needed by users)
+scripts/
+
 # Tests
 test/
 tests/

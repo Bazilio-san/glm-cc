@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
-'use strict';
+import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
 
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const readline = require('readline');
-const { spawn } = require('child_process');
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
+import readline from 'node:readline';
+import { spawn } from 'node:child_process';
 
 const CONFIG_FILE = path.join(os.homedir(), '.glm-claude-code.json');
 
@@ -18,7 +20,7 @@ const CONFIG_FIELDS = [
   },
   {
     key: 'ANTHROPIC_AUTH_TOKEN',
-    label: 'Anthropic Auth Token (primary)',
+    label: 'Anthropic Auth Token',
     defaultValue: '',
   },
   {
@@ -65,7 +67,7 @@ async function runConfig(fields) {
     const current = config[field.key] !== undefined && config[field.key] !== ''
       ? config[field.key]
       : field.defaultValue;
-    const hint = current ? ` [${current}]` : '';
+    const hint = current ? ` [\x1b[32m${current}\x1b[0m]` : '';
     const answer = await ask(rl, `${field.label}${hint}: `);
     config[field.key] = answer.trim() !== '' ? answer.trim() : current;
   }
@@ -122,6 +124,11 @@ function launchClaude(config) {
 
 async function main() {
   const args = process.argv.slice(2);
+
+  if (args.includes('-v') || args.includes('-V') || args.includes('--version') || args.includes('-version')) {
+    console.log(pkg.version);
+    return;
+  }
 
   if (args.includes('-h') || args.includes('--help')) {
     showHelp(loadConfig());
