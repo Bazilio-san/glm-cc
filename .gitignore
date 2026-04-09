@@ -1,0 +1,5 @@
+*.local.*
+/.serena/
+/.idea/
+/.npmrc
+/_tmp/

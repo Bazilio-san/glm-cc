@@ -1,0 +1,39 @@
+{
+  "name": "@bazilio-san/glm-cc",
+  "version": "1.0.0",
+  "description": "CLI tool for running claude with custom GLM configuration",
+  "main": "bin/glm.js",
+  "bin": {
+    "glm": "./bin/glm.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "claude",
+    "cli",
+    "anthropic",
+    "glm"
+  ],
+  "author": {
+    "name": "Viacheslav Makarov",
+    "email": "npmjs@bazilio.ru"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bazilio-san/glm-cc.git"
+  },
+  "homepage": "https://github.com/Bazilio-san/glm-cc#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ]
+}

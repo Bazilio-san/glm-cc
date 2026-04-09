@@ -1,0 +1,25 @@
+# Development and IDE
+.claude/
+.idea/
+.git/
+.serena/
+.vscode/
+
+# Env and secrets
+.env
+.env.*
+
+# Development docs
+prompt_*.md
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Tests
+test/
+tests/
+__tests__/
+*.test.js
+*.spec.js
