@@ -1,6 +1,6 @@
 {
   "name": "@bazilio-san/glm-cc",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "CLI tool for running claude with custom GLM configuration",
   "main": "bin/glm.js",
   "bin": {

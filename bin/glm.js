@@ -95,6 +95,54 @@ function showConfig(config) {
   console.log(lines.join('\n'));
 }
 
+// Resolve `claude` into { cmd, args, useShell } without an extra cmd.exe
+// layer on Windows. A nested cmd.exe breaks ConPty stdin for Ink-based TUIs
+// (e.g. when glm is spawned via node-pty from a test harness).
+function resolveClaude() {
+  if (process.platform !== 'win32') {
+    return { cmd: 'claude', prefix: [], useShell: false };
+  }
+
+  const pathExts = (process.env.PATHEXT || '.COM;.EXE;.BAT;.CMD')
+    .split(';').map(e => e.toLowerCase()).filter(Boolean);
+  const pathDirs = (process.env.PATH || '').split(path.delimiter).filter(Boolean);
+
+  let exePath = null;
+  let cmdPath = null;
+  for (const dir of pathDirs) {
+    for (const ext of pathExts) {
+      const full = path.join(dir, 'claude' + ext);
+      if (!fs.existsSync(full)) continue;
+      if (ext === '.exe' && !exePath) exePath = full;
+      else if ((ext === '.cmd' || ext === '.bat') && !cmdPath) cmdPath = full;
+    }
+    if (exePath) break;
+  }
+
+  // Prefer native .exe — spawn directly, no shell layer.
+  if (exePath) {
+    return { cmd: exePath, prefix: [], useShell: false };
+  }
+
+  // npm shim on Windows looks like:
+  //   @"C:\Program Files\nodejs\node.exe" "...\cli.js" %*
+  // Parse it and spawn node directly so we skip the shim's cmd.exe.
+  if (cmdPath) {
+    try {
+      const shim = fs.readFileSync(cmdPath, 'utf8');
+      const m = shim.match(/"([^"]+\\node\.exe)"\s+"([^"]+\.(?:js|mjs|cjs))"/i);
+      if (m) {
+        return { cmd: m[1], prefix: [m[2]], useShell: false };
+      }
+    } catch { /* fall through */ }
+    // Can't parse — must go through shell for .cmd execution.
+    return { cmd: cmdPath, prefix: [], useShell: true };
+  }
+
+  // Nothing found — let cmd.exe resolve at runtime (legacy behavior).
+  return { cmd: 'claude', prefix: [], useShell: true };
+}
+
 function launchClaude(config, args) {
   const env = { ...process.env };
   for (const field of CONFIG_FIELDS) {
@@ -102,11 +150,21 @@ function launchClaude(config, args) {
       env[field.key] = config[field.key];
     }
   }
-  const proc = spawn('claude', args, {
+
+  const { cmd, prefix, useShell } = resolveClaude();
+  const proc = spawn(cmd, [...prefix, ...args], {
     env,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: useShell,
   });
+
+  const signals = ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK'];
+  for (const sig of signals) {
+    process.on(sig, () => {
+      try { proc.kill(sig); } catch { /* */ }
+    });
+  }
+
   proc.on('exit', code => process.exit(code ?? 0));
   proc.on('error', err => {
     console.error(`Failed to launch claude: ${err.message}`);
