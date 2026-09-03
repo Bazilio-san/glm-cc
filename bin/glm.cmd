@@ -15,7 +15,7 @@ set "GLM_ARGS=%*"
 
 rem --- glm-specific flags are delegated to the node helper ----------------
 set "GLM_PAD= %GLM_ARGS% "
-echo.%GLM_PAD%| findstr /I /C:" --glm-config " /C:" --glm-show " /C:" --glm-version " /C:" -c " >nul
+echo.%GLM_PAD%| findstr /I /C:" --glm-config " /C:" --glm-show " /C:" --glm-doctor " /C:" --glm-version " /C:" --glm-help " /C:" -c " >nul
 if not errorlevel 1 (
   node "%~dp0glm-config.js" %*
   exit /b %errorlevel%

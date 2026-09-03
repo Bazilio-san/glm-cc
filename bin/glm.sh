@@ -18,7 +18,7 @@ GLM_ENV_FILE="${HOME}/.glm-claude-code.env"
 
 # --- glm-specific flags delegate to the node helper -----------------------
 case " $* " in
-  *" --glm-config "*|*" -c "*|*" --glm-show "*|*" --glm-version "*)
+  *" --glm-config "*|*" -c "*|*" --glm-show "*|*" --glm-doctor "*|*" --glm-version "*|*" --glm-help "*)
     exec node "${GLM_BIN_DIR}/glm-config.js" "$@"
     ;;
 esac
